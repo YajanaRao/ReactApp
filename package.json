@@ -4,7 +4,7 @@
   "private": true,
   "engines": {
     "npm": "6.4.0",
-    "node": "9.5.0"
+    "node": "8.11.4"
   },
   "dependencies": {
     "react": "^16.6.3",
