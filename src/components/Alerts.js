@@ -35,7 +35,7 @@ export default class Alerts extends React.Component {
         }else{
             return(
                 <div className="container">
-
+                    <div className="col align-self-center"></div>
                 </div>
             )
         }
