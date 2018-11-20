@@ -8,7 +8,7 @@ export default class Alerts extends React.Component {
                     <div className="row">
                         <div className="col align-self-center">
                             <div className="alert alert-success alert-dismissible fade show" role="alert">
-                                <strong>{this.props.type}!</strong> {this.props.message}
+                                <strong>{this.props.type.toUpperCase()}!</strong> {this.props.message}
                                 <button type="button" className="close" data-dismiss="alert" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -23,7 +23,7 @@ export default class Alerts extends React.Component {
                     <div className="row">
                         <div className="col align-self-center">
                             <div className="alert alert-danger" role="alert">
-                                <strong>{this.props.type}!</strong> {this.props.message}
+                                <strong>{this.props.type.toUpperCase()}!</strong> {this.props.message}
                                 <button type="button" className="close" data-dismiss="alert" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>

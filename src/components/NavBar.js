@@ -3,7 +3,9 @@ import logo from '../logo.svg';
 import {  Link } from "react-router-dom";
 
 export default class NavBar extends React.Component {
+    
     render(){
+        console.log(this.props.status);
         return (
             
             <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -17,7 +19,7 @@ export default class NavBar extends React.Component {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav mr-auto">
                         <li className="nav-item active">
-                            <a className="nav-link" href="#">Home <span className="sr-only">(current)</span></a>
+                            <a className="nav-link" href="/">Home <span className="sr-only">(current)</span></a>
                         </li>
                         <li className="nav-item">
                             <a className="nav-link" href="#">Link</a>
@@ -39,11 +41,8 @@ export default class NavBar extends React.Component {
                     </ul>
                     <ul className="navbar-nav justify-content-end">
                         <li className="nav-item">
-                            <button className="btn btn-outline-light" type="button"> <Link to="/login">Login</Link></button>
-                        </li>
-                        <li className="nav-item">
-                            <button className="btn btn-outline-light" type="button"><Link to="/register">Sign Up</Link></button>
-                        </li>      
+                            <button className="btn btn-outline-light" type="button"> <Link to="/login">{this.props.status ? 'Log out':'Log in' }</Link></button>
+                        </li>  
                     </ul>
             </div>
         </nav>
