@@ -3,14 +3,14 @@ from flask import Flask,jsonify,request
 import string
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
-
+import time
 from elasticsearch import Elasticsearch
 
 app = Flask(__name__)
 CORS(app)
 
 
-# elasticsearch database object for users 
+
 class User():
     def __init__(self):
         self.es = Elasticsearch()
@@ -27,7 +27,7 @@ class User():
             }
 
             res = self.es.index(index="users", doc_type="user", body=user)
-            print(res['result'])
+            return(res)
         else:
             print("failed")
 
@@ -75,13 +75,16 @@ class User():
 
     def delete(self,email):
         output = self.query(email)
+        print(output)
+        res = {}
         for result in output:
             res = self.es.delete(
                 index="users", doc_type="user", id=result['_id'])
             print(res)
+        return jsonify(res)
     
 
-# basic login
+
 @app.route("/api/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -98,7 +101,6 @@ def login():
         else:
             result = user.query(form['email'])
             result = result[0]
-            print(result)
             default = result['_source']['acdefault']
             type = result['_source']['type']
 
@@ -114,7 +116,7 @@ def login():
         print(result)
         return jsonify(result)
 
-# updating password
+
 @app.route("/api/update", methods=['GET', 'POST'])
 def update():
     if request.method == 'POST':
@@ -132,16 +134,15 @@ def update():
         print(result)
         return jsonify(result)
 
-# updating password and permission
 @app.route("/api/users/acupdate", methods=['GET', 'POST'])
 def update_account():
     if request.method == 'POST':
         result = {}
-        error = None
         form = request.json
         print(form)
         user = User()
-
+        result['status'] = "success"
+        result['message'] = "updated successfully"
         if form['permission']:
             if user.update_permission(form['email'], form['permission']):
                 result['update'] = True
@@ -149,12 +150,12 @@ def update_account():
             if user.update_password(form['email'], form['password']):
                 result['password'] = True
         else:
-            result['status'] = "failed"
+            result['status'] = "error"
+            result['message'] = "Something went wrong"
 
         print(result)
         return jsonify(result)
 
-# list all users present
 @app.route("/api/users/all")
 def all():
     user = User()
@@ -163,6 +164,7 @@ def all():
     for res in output:
         result = {}
         if("_source" in res):
+            result['id'] = res['_id']
             result['name'] = res['_source']['name']
             result['email'] = res['_source']['email']
             result['type'] = res['_source']['type']
@@ -173,9 +175,10 @@ def all():
         
     return jsonify(data)
 
-# create account
+
 @app.route("/api/users/create",methods=['POST'])
 def create():
+    result = {}
     if request.method == 'POST':
         form = request.json
         print("form",form)
@@ -183,25 +186,37 @@ def create():
         output = user.query(form['email'])
         print("query output",output)
         if output:
-            data = "user present"
+            result['status'] = "error"
+            result['message'] = "user present"
         else:
-            user.create(form['name'], form['email'],
+            res = user.create(form['name'], form['email'],
                         form['password'],"user")
-            data = "user not present"
-        print(data)
-        return jsonify(data)
+            result['status'] = "success"
+            result['message'] = "user created successfully"
+            form.pop("password")
+            form['id'] = res['_id']
+            form['type'] = "user"
+            result['user'] = form
+        print(result)
+        return jsonify(result)
     else:
         return jsonify("need to give in post")
 
-# delete users
+
 @app.route('/api/users/delete')
-def delte():
+def delete():
     if request.method == 'GET':
+        result = {}
         email = request.args.get('email')
         if email:
             user = User()
             user.delete(email)
-            return jsonify("success")
+            time.sleep(1)
+            result['status'] = "success"
+            result['message'] = "Deleted successfully"
+            return jsonify(result)
         else:
-            return jsonify("failed")
+            result['status'] = "error"
+            result['message'] = "Something went wrong"
+            return jsonify(result)
     
